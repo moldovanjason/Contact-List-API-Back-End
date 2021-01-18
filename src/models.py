@@ -4,16 +4,23 @@ db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    name = db.Column(db.String(60), nullable=False)
+    email = db.Column(db.String(60), unique=True, nullable=False)
+    phone = db.Column(db.String(12), nullable=False)
+    address = db.Column(db.String(60), nullable=False)
+    stage = db.Column(db.String(20), nullable=False)
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return self.name
 
     def serialize(self):
         return {
             "id": self.id,
+            "name":self.name,
             "email": self.email,
+            "phone":self.phone,
+            "address":self.address,
+            "stage":self.stage
+
             # do not serialize the password, its a security breach
         }

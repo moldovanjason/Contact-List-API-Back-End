@@ -31,13 +31,52 @@ def sitemap():
     return generate_sitemap(app)
 
 @app.route('/user', methods=['GET'])
-def handle_hello():
+def get_all_users():
+    user_query = User.query.all()
+    all_users = list(map(lambda x: x.serialize(), user_query)) #list comp look up
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+    return jsonify(all_users), 200
 
-    return jsonify(response_body), 200
+@app.route('/user/<int:id>', methods=['GET'])
+def get_single_user(id):
+    user_query = User.query.get(id)
+
+    return jsonify(user_query.serialize()), 200
+
+@app.route('/user/<int:id>', methods=['PUT'])
+def update_user(id):
+    user_query = User.query.get(id)
+    body = request.get_json()
+    if "name" in body:
+        user_query.name = body['name']
+    if "address" in body:
+        user_query.address = body['address']
+    if "phone" in body:
+        user_query.phone = body['phone']
+    if "email" in body:
+        user_query.email = body['email']
+    if "stage" in body:
+        user_query.stage = body['stage']
+
+    db.session.commit()
+
+    return jsonify(user_query.serialize()), 200
+
+@app.route('/user', methods=['POST'])
+def create_user():
+    body = request.get_json()
+    user = User(
+        name= body['name'],
+        address= body['address'],
+        phone= body['phone'],
+        email= body['email'],
+        stage= body['stage']
+    )
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
